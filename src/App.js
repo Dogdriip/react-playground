@@ -1,17 +1,30 @@
 import React, { useState } from "react";
 import "./styles.css";
 
-const App = () => {
-  const [item, setItem] = useState(0);
-  const incrementItem = () => setItem(item + 1);
-  const decrementItem = () => setItem(item - 1);
+const useInput = (initialValue, validator) => {
+  const [value, setValue] = useState(initialValue);
+  const onChange = (event) => {
+    const {
+      target: { value }
+    } = event;
+    let willUpdate = true;
+    if (typeof validator === "function") {
+      willUpdate = validator(value);
+    }
+    if (willUpdate) {
+      setValue(value);
+    }
+  };
+  return { value, onChange };
+};
 
+const App = () => {
+  const maxLenValidator = (value) => value.length <= 10;
+  const name = useInput("", maxLenValidator);
   return (
     <>
       <h1>Hello!</h1>
-      <p>{item}</p>
-      <button onClick={incrementItem}>+</button>
-      <button onClick={decrementItem}>-</button>
+      <input placeholder="Name" {...name} />
     </>
   );
 };

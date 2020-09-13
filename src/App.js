@@ -1,21 +1,15 @@
-import React, { useState, useEffect } from "react";
-
-const useTitle = (initialTitle) => {
-  const [title, setTitle] = useState(initialTitle);
-  const updateTitle = () => {
-    const htmlTitle = document.querySelector("title");
-    htmlTitle.innerText = title;
-  };
-  useEffect(updateTitle, [title]);
-  return setTitle;
-};
+import React, { useState, useEffect, useRef } from "react";
 
 const App = () => {
-  const titleUpdater = useTitle("Loading...");
-  setTimeout(() => titleUpdater("Home"), 3000);
+  const input = useRef();
+  useEffect(() => {
+    setTimeout(() => (input.current.value = "Hello"), 3000);
+  }, []); // only executes at componentDidMount
+
   return (
     <>
       <h1>Hello!</h1>
+      <input ref={input} placeholder="Name" />
     </>
   );
 };

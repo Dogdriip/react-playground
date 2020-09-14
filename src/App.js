@@ -1,30 +1,30 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const useConfirm = (message, onConfirm, onCancel) => {
-  if (!onConfirm || typeof onConfirm !== "function") return;
-  if (!onCancel || typeof onCancel !== "function") return;
-
-  const confirmAction = () => {
-    if (confirm(message)) {
-      onConfirm();
-    } else {
-      onCancel();
-    }
+const usePreventLeave = () => {
+  const listener = (e) => {
+    e.preventDefault();
+    e.returnValue = ""; // for chrome specific
   };
 
-  return confirmAction;
+  const enablePrevent = () => {
+    window.addEventListener("beforeunload", listener);
+  };
+  const disablePrevent = () => {
+    window.removeEventListener("beforeunload", listener);
+  };
+
+  return [enablePrevent, disablePrevent];
 };
 
 const App = () => {
-  const deleteSomething = () => console.log("Deleted!");
-  const abort = () => console.log("Aborted!");
-
-  const confirmDelete = useConfirm("Are you sure?", deleteSomething, abort);
+  const [prevent, unprevent] = usePreventLeave();
 
   return (
     <>
       <h1>Hello!</h1>
-      <button onClick={confirmDelete}>Delete something</button>
+      <button onClick={prevent}>Prevent</button>
+      <button onClick={unprevent}>Unprevent</button>
+      <button onClick={() => window.location.reload()}>Reload</button>
     </>
   );
 };

@@ -1,29 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const usePreventLeave = () => {
-  const listener = (e) => {
-    e.preventDefault();
-    e.returnValue = ""; // for chrome specific
-  };
+const useBeforeLeave = (onBefore) => {
+  if (!onBefore || typeof onBefore !== "function") return;
 
-  const enablePrevent = () => {
-    window.addEventListener("beforeunload", listener);
-  };
-  const disablePrevent = () => {
-    window.removeEventListener("beforeunload", listener);
-  };
+  const handle = () => onBefore();
 
-  return [enablePrevent, disablePrevent];
+  useEffect(() => {
+    document.addEventListener("mouseleave", handle);
+    return () => document.removeEventListener("mouseleave", handle);
+  }, []);
 };
 
 const App = () => {
-  const [prevent, unprevent] = usePreventLeave();
-
+  const messager = () => console.log("Don't leave!");
+  useBeforeLeave(messager);
   return (
     <>
       <h1>Hello!</h1>
-      <button onClick={prevent}>Prevent</button>
-      <button onClick={unprevent}>Unprevent</button>
       <button onClick={() => window.location.reload()}>Reload</button>
     </>
   );

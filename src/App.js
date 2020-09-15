@@ -1,23 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
 
-const useBeforeLeave = (onBefore) => {
-  if (!onBefore || typeof onBefore !== "function") return;
+const useFadeIn = (duration = 2, delay = 1) => {
+  if (typeof duration !== "number" || typeof delay !== "number") {
+    return;
+  }
 
-  const handle = () => onBefore();
+  const element = useRef();
 
   useEffect(() => {
-    document.addEventListener("mouseleave", handle);
-    return () => document.removeEventListener("mouseleave", handle);
+    if (element.current) {
+      const { current } = element;
+      current.style.transition = `opacity ${duration}s ease-in-out ${delay}s`;
+      current.style.opacity = 1;
+    }
   }, []);
+
+  return { ref: element, style: { opacity: 0 } };
 };
 
 const App = () => {
-  const messager = () => console.log("Don't leave!");
-  useBeforeLeave(messager);
+  const fadeInH1 = useFadeIn(1, 2);
+  const fadeInP = useFadeIn(3, 4);
+
   return (
     <>
-      <h1>Hello!</h1>
-      <button onClick={() => window.location.reload()}>Reload</button>
+      <h1 {...fadeInH1}>Hello!</h1>
+      <p {...fadeInP}>This is a paragraph</p>
     </>
   );
 };

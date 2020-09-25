@@ -1,42 +1,36 @@
 import React, { useState, useRef } from "react";
 
-const useFullscreen = (callback) => {
-  const el = useRef();
+const useNotification = (title, options) => {
+  if (!("Notification" in window)) {
+    return;
+  }
 
-  const makeFullscreen = () => {
-    if (el.current) {
-      el.current.requestFullscreen();
-      if (callback && typeof callback === "function") {
-        callback(true);
-      }
+  const fireNoti = () => {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "granted") {
+          new Notification(title, options);
+        } else {
+          return;
+        }
+      });
+    } else {
+      new Notification(title, options);
     }
   };
 
-  const exitFullscreen = () => {
-    document.exitFullscreen();
-    if (callback && typeof callback === "function") {
-      callback(false);
-    }
-  };
-
-  return { el, makeFullscreen, exitFullscreen };
+  return fireNoti;
 };
 
 const App = () => {
-  const onFullscreen = (isFullscreen) => {
-    console.log(
-      isFullscreen ? "Fullscreen activated" : "Fullscreen deactivated"
-    );
-  };
+  const makeNoti = useNotification("Hello!", {
+    body: "I'm a Notification!"
+  });
 
-  const { el, makeFullscreen, exitFullscreen } = useFullscreen(onFullscreen);
   return (
     <>
-      <div ref={el}>
-        <h1>Hello!</h1>
-        <button onClick={makeFullscreen}>Make fullscreen</button>
-        <button onClick={exitFullscreen}>Exit fullscreen</button>
-      </div>
+      <h1>Hello!</h1>
+      <button onClick={makeNoti}>Make notification!</button>
     </>
   );
 };

@@ -1,38 +1,43 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 
-const useScroll = () => {
-  const [state, setState] = useState({
-    y: 0,
-    x: 0
-  });
+const useFullscreen = (callback) => {
+  const el = useRef();
 
-  const onScroll = () => {
-    // console.log(window.scrollY, " ", window.scrollX);
-    setState({ y: window.scrollY, x: window.scrollX });
+  const makeFullscreen = () => {
+    if (el.current) {
+      el.current.requestFullscreen();
+      if (callback && typeof callback === "function") {
+        callback(true);
+      }
+    }
   };
 
-  useEffect(() => {
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const exitFullscreen = () => {
+    document.exitFullscreen();
+    if (callback && typeof callback === "function") {
+      callback(false);
+    }
+  };
 
-  return state;
+  return { el, makeFullscreen, exitFullscreen };
 };
 
 const App = () => {
-  const { y } = useScroll();
+  const onFullscreen = (isFullscreen) => {
+    console.log(
+      isFullscreen ? "Fullscreen activated" : "Fullscreen deactivated"
+    );
+  };
 
+  const { el, makeFullscreen, exitFullscreen } = useFullscreen(onFullscreen);
   return (
-    <div style={{ height: "1000px" }}>
-      <h1
-        style={{
-          position: "fixed",
-          color: y > 100 ? "red" : "blue"
-        }}
-      >
-        Hello!
-      </h1>
-    </div>
+    <>
+      <div ref={el}>
+        <h1>Hello!</h1>
+        <button onClick={makeFullscreen}>Make fullscreen</button>
+        <button onClick={exitFullscreen}>Exit fullscreen</button>
+      </div>
+    </>
   );
 };
 export default App;

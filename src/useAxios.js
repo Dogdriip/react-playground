@@ -9,17 +9,16 @@ const useAxios = (opts, axiosInstance = defaultAxios) => {
     error: null,
     data: null
   });
-  const [trigger, useTrigger] = useState(0);
+  const [trigger, setTrigger] = useState(0);
 
   const refetch = () => {
     setState({ loading: true });
-    useTrigger(Date.now());
+    setTrigger(Date.now());
   };
 
   useEffect(() => {
     axiosInstance(opts)
       .then(({ data }) => {
-        console.log(data);
         setState({
           ...state,
           loading: false,

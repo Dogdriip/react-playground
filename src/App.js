@@ -1,36 +1,16 @@
 import React, { useState, useRef } from "react";
-
-const useNotification = (title, options) => {
-  if (!("Notification" in window)) {
-    return;
-  }
-
-  const fireNoti = () => {
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission().then((permission) => {
-        if (permission === "granted") {
-          new Notification(title, options);
-        } else {
-          return;
-        }
-      });
-    } else {
-      new Notification(title, options);
-    }
-  };
-
-  return fireNoti;
-};
+import useAxios from "./useAxios";
 
 const App = () => {
-  const makeNoti = useNotification("Hello!", {
-    body: "I'm a Notification!"
+  const { loading, error, data, refetch } = useAxios({
+    url: "https://yts-proxy.now.sh/list_movies.json"
   });
-
   return (
     <>
       <h1>Hello!</h1>
-      <button onClick={makeNoti}>Make notification!</button>
+      <h2>{loading && "Loading..."}</h2>
+      <button onClick={refetch}>Refetch</button>
+      <p>{data && JSON.stringify(data)}</p>
     </>
   );
 };

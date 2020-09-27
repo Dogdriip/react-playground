@@ -1,0 +1,41 @@
+import defaultAxios from "axios";
+import { useEffect, useState } from "react";
+
+const useAxios = (opts, axiosInstance = defaultAxios) => {
+  if (!opts.url) return;
+
+  const [state, setState] = useState({
+    loading: true,
+    error: null,
+    data: null
+  });
+  const [trigger, useTrigger] = useState(0);
+
+  const refetch = () => {
+    setState({ loading: true });
+    useTrigger(Date.now());
+  };
+
+  useEffect(() => {
+    axiosInstance(opts)
+      .then(({ data }) => {
+        console.log(data);
+        setState({
+          ...state,
+          loading: false,
+          data
+        });
+      })
+      .catch((error) => {
+        setState({
+          ...state,
+          loading: false,
+          error
+        });
+      });
+  }, [trigger]);
+
+  return { ...state, refetch };
+};
+
+export default useAxios;
